@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Gestione Turni Bar</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
       --bg: #f8fafc;
@@ -594,7 +596,7 @@
       <button type="button" class="btn btn-danger-outline" onclick="openResetModal()">🔄 Nuova Settimana</button>
     </div>
     <div class="toolbar-right">
-      <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Stampa</button>
+      <button type="button" class="btn btn-outline" id="btnPdf" onclick="downloadPDF(this)">🖨️ Stampa</button>
     </div>
   </div>
 
@@ -1024,6 +1026,82 @@
     renderDates();
     renderTable();
     closeResetModal();
+  }
+
+  async function downloadPDF(btn) {
+    // Fallback: if libraries failed to load (offline), use normal print
+    if (!window.html2canvas || !window.jspdf) { window.print(); return; }
+
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "⏳ ...";
+    let wrap = null;
+
+    try {
+      saveData();
+
+      wrap = document.createElement("div");
+      wrap.style.cssText = "position:fixed;left:-10000px;top:0;width:1100px;background:#fff;padding:20px;direction:ltr;";
+
+      const title = document.createElement("div");
+      title.textContent = document.getElementById("printTitle").textContent;
+      title.style.cssText = "font-size:22px;font-weight:800;text-align:center;margin-bottom:14px;color:#0f172a;";
+      wrap.appendChild(title);
+
+      const tc = document.querySelector(".table-container").cloneNode(true);
+      tc.style.overflow = "visible";
+      tc.style.boxShadow = "none";
+      tc.querySelector("table").style.minWidth = "0";
+      tc.querySelectorAll(".btn-trash").forEach(b => b.remove());
+      tc.querySelectorAll("th.col-name, td.col-name").forEach(e => e.style.position = "static");
+      wrap.appendChild(tc);
+
+      const notesText = (document.getElementById("notesArea").value || "").trim();
+      if (notesText) {
+        const notes = document.createElement("div");
+        notes.style.cssText = "margin-top:12px;border:1.5px solid #475569;border-radius:10px;padding:10px 14px;font-size:14px;white-space:pre-wrap;";
+        const h = document.createElement("div");
+        h.textContent = "📌 Note & Comunicazioni della Settimana";
+        h.style.cssText = "font-weight:700;margin-bottom:4px;color:#475569;";
+        const t = document.createElement("div");
+        t.textContent = notesText;
+        notes.appendChild(h);
+        notes.appendChild(t);
+        wrap.appendChild(notes);
+      }
+
+      document.body.appendChild(wrap);
+
+      const canvas = await html2canvas(wrap, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 8;
+      const maxW = pageW - margin * 2;
+      const maxH = pageH - margin * 2;
+
+      let imgW = maxW;
+      let imgH = (canvas.height * imgW) / canvas.width;
+      if (imgH > maxH) {
+        imgH = maxH;
+        imgW = (canvas.width * imgH) / canvas.height;
+      }
+      const x = (pageW - imgW) / 2;
+
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", x, margin, imgW, imgH);
+
+      const [y, m, d] = state.weekStart.split("-");
+      pdf.save(`Turni_Bar_${d}-${m}-${y}.pdf`);
+    } catch (e) {
+      console.error(e);
+      window.print();
+    } finally {
+      if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+    }
   }
 
   window.onclick = function(event) {
