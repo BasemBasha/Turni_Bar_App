@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gestione Turni Bar</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border: #cbd5e1;
+      --apertura-bg: #fef3c7;
+      --apertura-text: #92400e;
+      --chiusura-bg: #ede9fe;
+      --chiusura-text: #5b21b6;
+      --casa-bg: #f1f5f9;
+      --casa-text: #94a3b8;
+      --warning-bg: #fef08a;
+      --warning-text: #854d0e;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .title-box h1 { font-size: 1.25rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+    .title-box p { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+
+    .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    .date-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .date-control label { font-size: 0.82rem; font-weight: 600; color: #1e40af; }
+    .date-control input {
+      border: 1px solid #93c5fd;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      background: #fff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f8fafc; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      overflow-x: auto;
+      margin-bottom: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      min-width: 820px;
+    }
+
+    th, td {
+      padding: 12px 8px;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    thead th {
+      background: #1e293b;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    thead th .sub-date {
+      display: block;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    th.col-name, td.col-name {
+      text-align: left;
+      font-weight: 600;
+      min-width: 170px;
+      max-width: 200px;
+      padding-left: 14px;
+      position: sticky;
+      left: 0;
+      background: #fff;
+      z-index: 2;
+    }
+    thead th.col-name { background: #0f172a; z-index: 3; color: #fff; }
+
+    tr.row-apertura td { background: var(--apertura-bg); color: var(--apertura-text); font-weight: 600; }
+    tr.row-chiusura td { background: var(--chiusura-bg); color: var(--chiusura-text); font-weight: 600; }
+
+    .shift-cell {
+      cursor: pointer;
+      min-width: 95px;
+      transition: background 0.1s;
+      user-select: none;
+    }
+    .shift-cell:hover { background: #f8fafc; }
+
+    .shift-badge {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      width: 90%;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge-normal { color: #1e293b; }
+    .badge-casa { background: var(--casa-bg); color: var(--casa-text); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning-text); font-weight: 700; border: 1px dashed #eab308; }
+    .badge-empty { color: #cbd5e1; font-weight: 400; }
+    .badge-chiuso { background: #fee2e2; color: #991b1b; font-weight: 700; border: 1px solid #fecaca; }
+
+    .staff-row-name {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-delete-staff {
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .btn-delete-staff:hover { color: #ef4444; background: #fee2e2; }
+
+    /* Notes Box */
+    .notes-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+    .notes-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; color: #475569; display: flex; align-items: center; gap: 6px; }
+    .notes-card textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.88rem;
+      resize: vertical;
+      min-height: 50px;
+      outline: none;
+    }
+    .notes-card textarea:focus { border-color: var(--primary); }
+
+    /* Modal styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 99;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 440px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      animation: popIn 0.15s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-card h3 { font-size: 1.15rem; margin-bottom: 4px; color: #0f172a; }
+    .preset-section-label { font-size: 0.82rem; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .preset-btn {
+      padding: 10px 4px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover { background: #e2e8f0; transform: translateY(-1px); }
+    .preset-btn.btn-alert { background: #fef9c3; border-color: #fde047; color: #a16207; font-weight: 700; }
+    .preset-btn.btn-home { background: #f1f5f9; color: #475569; }
+    .preset-btn.btn-chiuso { background: #fee2e2; border-color: #fca5a5; color: #991b1b; font-weight: 700; }
+    .preset-btn.btn-clear { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+
+    .custom-input-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .custom-input-box input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .custom-input-box input:focus { border-color: var(--primary); }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* FULL-PAGE CENTERED PRINT CONFIGURATION */
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 4mm 2mm !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        min-height: 94vh !important;
+      }
+      header, .toolbar, .modal-overlay, .btn-delete-staff {
+        display: none !important;
+      }
+      .print-title {
+        display: block !important;
+        text-align: center;
+        font-size: 20pt;
+        font-weight: 800;
+        margin-bottom: 14px;
+        color: #0f172a;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+      .table-container {
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      table {
+        width: 100% !important;
+        min-width: 100% !important;
+        border-collapse: collapse !important;
+        border: 2.5px solid #0f172a !important;
+      }
+      tbody tr {
+        height: 52px !important;
+      }
+      th, td {
+        border: 1.5px solid #334155 !important;
+        padding: 10px 4px !important;
+        font-size: 12pt !important;
+        vertical-align: middle !important;
+      }
+      thead th {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        font-size: 12.5pt !important;
+        font-weight: 700 !important;
+        padding: 12px 4px !important;
+      }
+      thead th .sub-date {
+        color: #cbd5e1 !important;
+        font-size: 10.5pt !important;
+      }
+      th.col-name, td.col-name {
+        position: static !important;
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        padding-left: 12px !important;
+        width: 190px !important;
+        font-size: 12pt !important;
+      }
+      thead th.col-name {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+      }
+      tr.row-apertura td {
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+        font-weight: 800 !important;
+      }
+      tr.row-chiusura td {
+        background-color: #ede9fe !important;
+        color: #5b21b6 !important;
+        font-weight: 800 !important;
+      }
+      .shift-badge {
+        padding: 6px 6px !important;
+        font-size: 11.5pt !important;
+        font-weight: 700 !important;
+      }
+      .badge-chiuso {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        font-weight: 800 !important;
+        border: 1px solid #f87171 !important;
+      }
+      .badge-casa {
+        background-color: #e2e8f0 !important;
+        color: #64748b !important;
+      }
+      .badge-warning {
+        background-color: #fef08a !important;
+        color: #854d0e !important;
+        border: 1.5px dashed #ca8a04 !important;
+      }
+      .notes-card {
+        margin-top: 14px !important;
+        border: 1.5px solid #475569 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+      }
+      .notes-card h3 {
+        font-size: 11pt !important;
+        margin-bottom: 4px !important;
+        color: #1e293b !important;
+      }
+      .notes-card textarea {
+        border: none !important;
+        font-size: 10.5pt !important;
+        min-height: 48px !important;
+        padding: 0 !important;
+        resize: none !important;
+      }
+    }
+    .print-title { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="print-title" id="printTitle">☕ ORARIO TURNI BAR</div>
+
+  <!-- Header -->
+  <header>
+    <div class="title-box">
+      <h1>☕ Orario Turni Bar</h1>
+      <p id="headerSubtitle">Gestione turni settimanali</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="date-control">
+        <label for="weekStart">Lunedì Inizio:</label>
+        <input type="date" id="weekStart">
+      </div>
+      <button class="btn btn-outline" onclick="changeWeek(-7)">◀ Prec</button>
+      <button class="btn btn-outline" onclick="changeWeek(7)">Succ ▶</button>
+    </div>
+  </header>
+
+  <!-- Clean Toolbar -->
+  <div class="toolbar">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="btn btn-primary" onclick="openAddStaffModal()">➕ Aggiungi Dipendente</button>
+      <button class="btn btn-outline" onclick="resetShiftsOnly()" style="color: #b91c1c; font-weight: 700;">🔄 Nuova Settimana (Azzera Turni)</button>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="btn btn-outline" onclick="window.print()">🖨️ Stampa</button>
+    </div>
+  </div>
+
+  <!-- Shifts Table -->
+  <div class="table-container">
+    <table id="shiftsTable">
+      <thead>
+        <tr>
+          <th class="col-name">DIPENDENTE / RUOLO</th>
+          <th>Lunedì <span class="sub-date" id="d-0">-</span></th>
+          <th>Martedì <span class="sub-date" id="d-1">-</span></th>
+          <th>Mercoledì <span class="sub-date" id="d-2">-</span></th>
+          <th>Giovedì <span class="sub-date" id="d-3">-</span></th>
+          <th>Venerdì <span class="sub-date" id="d-4">-</span></th>
+          <th>Sabato <span class="sub-date" id="d-5">-</span></th>
+          <th>Domenica <span class="sub-date" id="d-6">-</span></th>
+        </tr>
+      </thead>
+      <tbody id="mainTableBody">
+        <!-- Apertura Bar -->
+        <tr class="row-apertura">
+          <td class="col-name">☀️ APERTURA BAR</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 0)" id="apertura-0">-</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 1)" id="apertura-1">-</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 2)" id="apertura-2">-</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 3)" id="apertura-3">-</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 4)" id="apertura-4">-</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 5)" id="apertura-5">-</td>
+          <td class="shift-cell" onclick="editRoleCell('apertura', 6)" id="apertura-6">-</td>
+        </tr>
+
+        <!-- Staff Rows injected dynamically here -->
+
+        <!-- Chiusura Bar -->
+        <tr class="row-chiusura" id="chiusuraRow">
+          <td class="col-name">🌙 CHIUSURA BAR</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 0)" id="chiusura-0">-</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 1)" id="chiusura-1">-</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 2)" id="chiusura-2">-</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 3)" id="chiusura-3">-</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 4)" id="chiusura-4">-</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 5)" id="chiusura-5">-</td>
+          <td class="shift-cell" onclick="editRoleCell('chiusura', 6)" id="chiusura-6">-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Notes Area restored -->
+  <div class="notes-card">
+    <h3>📌 Note & Comunicazioni della Settimana</h3>
+    <textarea id="notesArea" placeholder="Scrivi qui eventuali note, cambi turno, avvisi per il team..." oninput="saveData()"></textarea>
+  </div>
+</div>
+
+<!-- Modal for Shifts & Roles -->
+<div class="modal-overlay" id="shiftModal">
+  <div class="modal-card">
+    <h3 id="modalTitle">Imposta Turno</h3>
+    <div class="preset-section-label" id="modalSubtitle">Orari più frequenti (clicca per inserire):</div>
+
+    <div class="preset-grid" id="presetGrid"></div>
+
+    <div class="preset-section-label" id="customInputLabel">Oppure scrivi orario speciale / personalizzato:</div>
+    <div class="custom-input-box">
+      <input type="text" id="customInput" placeholder="es. 8-13 oppure 11-16..." onkeydown="if(event.key==='Enter') applyCustom()">
+      <button class="btn btn-primary" onclick="applyCustom()">Salva</button>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Staff Modal -->
+<div class="modal-overlay" id="addStaffModal">
+  <div class="modal-card">
+    <h3>➕ Aggiungi Dipendente</h3>
+    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Inserisci il nome del nuovo collaboratore da aggiungere al calendario.</p>
+    <div class="custom-input-box">
+      <input type="text" id="newStaffName" placeholder="Nome (es. Marco)" onkeydown="if(event.key==='Enter') confirmAddStaff()">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAddStaffModal()">Annulla</button>
+      <button class="btn btn-primary" onclick="confirmAddStaff()">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SHIFT_PRESETS = [
+    { label: "9-14", val: "9-14", cls: "" },
+    { label: "15-21", val: "15-21", cls: "" },
+    { label: "17-21", val: "17-21", cls: "" },
+    { label: "10-14 / 18-21", val: "10-14 / 18-21", cls: "" },
+    { label: "10-14:30", val: "10-14:30", cls: "" },
+    { label: "7-14:30", val: "7-14:30", cls: "" },
+    { label: "9:30-14", val: "9:30-14", cls: "" },
+    { label: "14:30-21", val: "14:30-21", cls: "" },
+    { label: "16-21", val: "16-21", cls: "" },
+    { label: "🏠 CASA", val: "CASA", cls: "btn-home" },
+    { label: "⚠️ //", val: "//", cls: "btn-alert" },
+    { label: "❌ Svuota", val: "", cls: "btn-clear" }
+  ];
+
+  const defaultStaff = [
+    { id: 1, name: "Marika", shifts: ["//", "", "//", "//", "//", "7-14:30", "CASA"] },
+    { id: 2, name: "Giada", shifts: ["9-14", "10-14 / 18-21", "9-14", "10-14:30", "9-14", "9:30-14", "CASA"] },
+    { id: 3, name: "Sofy", shifts: ["CASA", "15-21", "17-21", "15-21", "CASA", "16-21", "CASA"] },
+    { id: 4, name: "Macy", shifts: ["15-21", "CASA", "17-21", "CASA", "15-21", "14:30-21", "CASA"] }
+  ];
+
+  const defaultApertura = ["Giada", "Giada", "Giada", "Giada", "Giada", "Marika", "CHIUSO"];
+  const defaultChiusura = ["Lello e Marika", "Lello", "Marika", "Marika", "Marika", "Lello", "CHIUSO"];
+
+  let state = {
+    weekStart: "2026-11-02",
+    staff: defaultStaff,
+    apertura: defaultApertura,
+    chiusura: defaultChiusura,
+    notes: ""
+  };
+
+  let activeTarget = null;
+
+  const dayNames = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+  const monthNamesIt = [
+    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+  ];
+
+  function init() {
+    const saved = localStorage.getItem("bar_turni_data_v6");
+    if (saved) {
+      try { state = JSON.parse(saved); } catch (e) {}
+    }
+    
+    if (!state.apertura[6]) state.apertura[6] = "CHIUSO";
+    if (!state.chiusura[6]) state.chiusura[6] = "CHIUSO";
+
+    document.getElementById("weekStart").value = state.weekStart;
+    document.getElementById("notesArea").value = state.notes || "";
+    document.getElementById("weekStart").addEventListener("change", (e) => {
+      state.weekStart = e.target.value;
+      saveData();
+      renderDates();
+    });
+
+    renderDates();
+    renderTable();
+  }
+
+  function saveData() {
+    state.notes = document.getElementById("notesArea").value;
+    localStorage.setItem("bar_turni_data_v6", JSON.stringify(state));
+  }
+
+  function renderDates() {
+    if (!state.weekStart) return;
+    const [y, m, d] = state.weekStart.split("-").map(Number);
+    const curr = new Date(y, m - 1, d);
+
+    let endMonth = curr.getMonth();
+    for (let i = 0; i < 7; i++) {
+      const targetDate = new Date(curr);
+      targetDate.setDate(curr.getDate() + i);
+      const dayNum = String(targetDate.getDate()).padStart(2, "0");
+      const monthNum = String(targetDate.getMonth() + 1).padStart(2, "0");
+      document.getElementById(`d-${i}`).textContent = `${dayNum}/${monthNum}`;
+      if (i === 6) {
+        endMonth = targetDate.getMonth();
+      }
+    }
+
+    // Italian month name for print header (e.g. "MESE DI NOVEMBRE" or "MESE DI OTTOBRE - NOVEMBRE")
+    let displayMonth = monthNamesIt[curr.getMonth()];
+    if (curr.getMonth() !== endMonth) {
+      displayMonth = `${monthNamesIt[curr.getMonth()]} - ${monthNamesIt[endMonth]}`;
+    }
+
+    // Sets exact month title in Italian for print!
+    document.getElementById("printTitle").textContent = `☕ ORARIO TURNI BAR — MESE DI ${displayMonth.toUpperCase()}`;
+    document.getElementById("headerSubtitle").textContent = `Mese di ${displayMonth}`;
+  }
+
+  function changeWeek(offsetDays) {
+    const [y, m, d] = state.weekStart.split("-").map(Number);
+    const curr = new Date(y, m - 1, d);
+    curr.setDate(curr.getDate() + offsetDays);
+    const yStr = curr.getFullYear();
+    const mStr = String(curr.getMonth() + 1).padStart(2, "0");
+    const dStr = String(curr.getDate()).padStart(2, "0");
+    state.weekStart = `${yStr}-${mStr}-${dStr}`;
+    document.getElementById("weekStart").value = state.weekStart;
+    saveData();
+    renderDates();
+  }
+
+  function renderTable() {
+    // Apertura
+    for (let i = 0; i < 7; i++) {
+      const cell = document.getElementById(`apertura-${i}`);
+      const val = state.apertura[i] || "";
+      if (val === "CHIUSO") {
+        cell.innerHTML = `<span class="shift-badge badge-chiuso">🔒 CHIUSO</span>`;
+      } else if (val) {
+        cell.innerHTML = `<span class="shift-badge" style="color:#92400e; font-weight:700;">${val}</span>`;
+      } else {
+        cell.innerHTML = `<span class="shift-badge badge-empty">-</span>`;
+      }
+    }
+
+    // Chiusura
+    for (let i = 0; i < 7; i++) {
+      const cell = document.getElementById(`chiusura-${i}`);
+      const val = state.chiusura[i] || "";
+      if (val === "CHIUSO") {
+        cell.innerHTML = `<span class="shift-badge badge-chiuso">🔒 CHIUSO</span>`;
+      } else if (val) {
+        cell.innerHTML = `<span class="shift-badge" style="color:#5b21b6; font-weight:700;">${val}</span>`;
+      } else {
+        cell.innerHTML = `<span class="shift-badge badge-empty">-</span>`;
+      }
+    }
+
+    // Dynamic Staff Rows inside single tbody
+    const tbody = document.getElementById("mainTableBody");
+    const existingStaffRows = tbody.querySelectorAll(".staff-row-dynamic");
+    existingStaffRows.forEach(r => r.remove());
+
+    const chiusuraRow = document.getElementById("chiusuraRow");
+
+    state.staff.forEach(person => {
+      const tr = document.createElement("tr");
+      tr.className = "staff-row-dynamic";
+
+      const tdName = document.createElement("td");
+      tdName.className = "col-name";
+      tdName.innerHTML = `
+        <div class="staff-row-name">
+          <span>${person.name}</span>
+          <button class="btn-delete-staff" title="Rimuovi ${person.name}" onclick="deleteStaff(${person.id}, '${person.name}')">🗑️</button>
+        </div>
+      `;
+      tr.appendChild(tdName);
+
+      for (let i = 0; i < 7; i++) {
+        const val = person.shifts[i] || "";
+        const td = document.createElement("td");
+        td.className = "shift-cell";
+        td.onclick = () => openShiftModal(person.id, person.name, i);
+
+        let badgeClass = "badge-normal";
+        if (!val) badgeClass = "badge-empty";
+        else if (val.toUpperCase() === "CASA") badgeClass = "badge-casa";
+        else if (val === "//") badgeClass = "badge-warning";
+        else if (val.toUpperCase() === "CHIUSO") badgeClass = "badge-chiuso";
+
+        td.innerHTML = `<span class="shift-badge ${badgeClass}">${val || "-"}</span>`;
+        tr.appendChild(td);
+      }
+
+      tbody.insertBefore(tr, chiusuraRow);
+    });
+  }
+
+  function openShiftModal(staffId, staffName, dayIdx) {
+    activeTarget = { type: 'staff', staffId, dayIdx };
+    const person = state.staff.find(s => s.id === staffId);
+    const currentVal = person ? (person.shifts[dayIdx] || "") : "";
+
+    document.getElementById("modalTitle").textContent = `${staffName} — ${dayNames[dayIdx]}`;
+    document.getElementById("modalSubtitle").textContent = "Orari più frequenti (clicca per inserire):";
+    document.getElementById("customInputLabel").textContent = "Oppure scrivi orario personalizzato:";
+    document.getElementById("customInput").placeholder = "es. 8-13 oppure 11-16...";
+    document.getElementById("customInput").value = currentVal;
+
+    const grid = document.getElementById("presetGrid");
+    grid.innerHTML = "";
+    SHIFT_PRESETS.forEach(item => {
+      const btn = document.createElement("button");
+      btn.className = `preset-btn ${item.cls}`;
+      btn.textContent = item.label;
+      btn.onclick = () => applyPreset(item.val);
+      grid.appendChild(btn);
+    });
+
+    document.getElementById("shiftModal").classList.add("active");
+    setTimeout(() => {
+      document.getElementById("customInput").focus();
+      document.getElementById("customInput").select();
+    }, 100);
+  }
+
+  function editRoleCell(roleType, dayIdx) {
+    activeTarget = { type: roleType, dayIdx };
+    const label = roleType === 'apertura' ? '☀️ Apertura Bar' : '🌙 Chiusura Bar';
+    const currentVal = state[roleType][dayIdx] || "";
+
+    document.getElementById("modalTitle").textContent = `${label} — ${dayNames[dayIdx]}`;
+    document.getElementById("modalSubtitle").textContent = "Seleziona chi apre/chiude o scrivi un nome:";
+    document.getElementById("customInputLabel").textContent = "Oppure scrivi un nome specifico:";
+    document.getElementById("customInput").placeholder = "es. Nome persona...";
+    document.getElementById("customInput").value = currentVal;
+
+    const grid = document.getElementById("presetGrid");
+    grid.innerHTML = "";
+    
+    const chiusoBtn = document.createElement("button");
+    chiusoBtn.className = "preset-btn btn-chiuso";
+    chiusoBtn.textContent = "🔒 CHIUSO";
+    chiusoBtn.onclick = () => applyPreset("CHIUSO");
+    grid.appendChild(chiusoBtn);
+
+    state.staff.forEach(s => {
+      const btn = document.createElement("button");
+      btn.className = "preset-btn";
+      btn.textContent = s.name;
+      btn.onclick = () => applyPreset(s.name);
+      grid.appendChild(btn);
+    });
+
+    const extras = ["Lello", "Lello e Marika"];
+    extras.forEach(name => {
+      if (!state.staff.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+        const btn = document.createElement("button");
+        btn.className = "preset-btn";
+        btn.textContent = name;
+        btn.onclick = () => applyPreset(name);
+        grid.appendChild(btn);
+      }
+    });
+
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "preset-btn btn-clear";
+    clearBtn.textContent = "❌ Svuota";
+    clearBtn.onclick = () => applyPreset("");
+    grid.appendChild(clearBtn);
+
+    document.getElementById("shiftModal").classList.add("active");
+    setTimeout(() => {
+      document.getElementById("customInput").focus();
+      document.getElementById("customInput").select();
+    }, 100);
+  }
+
+  function applyPreset(val) { applyValue(val); }
+  function applyCustom() { applyValue(document.getElementById("customInput").value.trim()); }
+
+  function applyValue(val) {
+    if (!activeTarget) return;
+    if (activeTarget.type === 'staff') {
+      const p = state.staff.find(s => s.id === activeTarget.staffId);
+      if (p) p.shifts[activeTarget.dayIdx] = val;
+    } else if (activeTarget.type === 'apertura') {
+      state.apertura[activeTarget.dayIdx] = val;
+    } else if (activeTarget.type === 'chiusura') {
+      state.chiusura[activeTarget.dayIdx] = val;
+    }
+    saveData();
+    renderDates();
+    renderTable();
+    closeModal();
+  }
+
+  function closeModal() {
+    document.getElementById("shiftModal").classList.remove("active");
+    activeTarget = null;
+  }
+
+  function openAddStaffModal() {
+    document.getElementById("newStaffName").value = "";
+    document.getElementById("addStaffModal").classList.add("active");
+    setTimeout(() => document.getElementById("newStaffName").focus(), 100);
+  }
+
+  function closeAddStaffModal() {
+    document.getElementById("addStaffModal").classList.remove("active");
+  }
+
+  function confirmAddStaff() {
+    const name = document.getElementById("newStaffName").value.trim();
+    if (!name) return;
+    state.staff.push({
+      id: Date.now(),
+      name: name,
+      shifts: ["", "", "", "", "", "", ""]
+    });
+    saveData();
+    renderTable();
+    closeAddStaffModal();
+  }
+
+  function deleteStaff(id, name) {
+    if (confirm(`Sei sicuro di voler削除 "${name}" dalla tabella?`)) {
+      state.staff = state.staff.filter(s => s.id !== id);
+      saveData();
+      renderTable();
+    }
+  }
+
+  function resetShiftsOnly() {
+    if (confirm("Vuoi azzerare tutti i turni per iniziare una nuova settimana? (I nomi dei dipendenti rimarranno salvati)")) {
+      state.staff.forEach(s => s.shifts = ["", "", "", "", "", "", ""]);
+      state.apertura = ["", "", "", "", "", "", "CHIUSO"];
+      state.chiusura = ["", "", "", "", "", "", "CHIUSO"];
+      
+      const [y, m, d] = state.weekStart.split("-").map(Number);
+      const curr = new Date(y, m - 1, d);
+      curr.setDate(curr.getDate() + 7);
+      const yStr = curr.getFullYear();
+      const mStr = String(curr.getMonth() + 1).padStart(2, "0");
+      const dStr = String(curr.getDate()).padStart(2, "0");
+      state.weekStart = `${yStr}-${mStr}-${dStr}`;
+      document.getElementById("weekStart").value = state.weekStart;
+
+      saveData();
+      renderDates();
+      renderTable();
+    }
+  }
+
+  window.onclick = function(event) {
+    if (event.target.classList.contains("modal-overlay")) {
+      closeModal();
+      closeAddStaffModal();
+    }
+  }
+
+  window.onload = init;
+</script>
+
+</body>
+</html>
