@@ -36,7 +36,6 @@
 
     html, body {
       direction: ltr !important;
-      unicode-bidi: isolate !important;
       background: var(--bg); 
       color: var(--text); 
       padding: 10px; 
@@ -48,7 +47,6 @@
       margin: 0 auto; 
     }
 
-    /* Top Header */
     header {
       background: var(--card);
       border: 1px solid var(--border);
@@ -82,19 +80,17 @@
       font-weight: 600;
     }
 
-    /* Date Navigation Wrapper */
     .date-nav-wrapper {
       display: flex;
       align-items: center;
       gap: 6px;
-      direction: ltr !important;
     }
 
     .btn-arrow {
       background: #fff;
       border: 1.5px solid var(--border);
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -107,7 +103,9 @@
     }
     .btn-arrow:active { background: #e2e8f0; }
 
-    .date-box {
+    /* Bulletproof Date Display */
+    .custom-date-trigger {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -115,30 +113,40 @@
       border: 1.5px solid #bfdbfe;
       padding: 5px 10px;
       border-radius: 8px;
-      direction: ltr !important;
+      cursor: pointer;
+      overflow: hidden;
     }
-    .date-box label { 
+    .custom-date-trigger label { 
       font-size: 0.78rem; 
       font-weight: 700; 
       color: #1e40af; 
-      white-space: nowrap;
+      pointer-events: none;
     }
-    .date-box input {
-      border: 1px solid #93c5fd;
-      padding: 4px 6px;
-      border-radius: 6px;
+    .custom-date-text {
       font-size: 0.88rem;
-      font-weight: 700;
+      font-weight: 800;
       color: #1e3a8a;
       background: #fff;
-      outline: none;
-      direction: ltr !important;
-      unicode-bidi: isolate !important;
-      font-variant-numeric: tabular-nums;
+      border: 1px solid #93c5fd;
+      padding: 3px 8px;
+      border-radius: 6px;
+      min-width: 95px;
       text-align: center;
+      letter-spacing: 0.3px;
+      pointer-events: none;
+      direction: ltr !important;
+    }
+    .custom-date-trigger input[type="date"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
     }
 
-    /* Toolbar */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -173,7 +181,6 @@
     .btn-danger-outline { background: #fff; border: 1.5px solid #fca5a5; color: #b91c1c; }
     .btn-danger { background: #dc2626; color: #fff; }
 
-    /* Single Responsive Table with Sticky Left Column */
     .table-container {
       background: var(--card);
       border-radius: 12px;
@@ -223,7 +230,6 @@
       direction: ltr !important;
     }
 
-    /* STICKY LEFT COLUMN */
     th.col-name, td.col-name {
       position: sticky;
       left: 0;
@@ -273,7 +279,6 @@
       background: #f1f5f9; 
     }
 
-    /* Shift Badges */
     .shift-badge {
       display: block;
       padding: 5px 2px;
@@ -316,7 +321,6 @@
       margin-bottom: 10px;
     }
 
-    /* Notes Box */
     .notes-card {
       background: var(--card);
       border-radius: 12px;
@@ -342,7 +346,6 @@
     }
     .notes-card textarea:focus { border-color: var(--primary); }
 
-    /* Modals / Centered Popups */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -433,7 +436,6 @@
 
     .print-title { display: none; }
 
-    /* Mobile Overrides */
     @media (max-width: 640px) {
       header {
         flex-direction: column;
@@ -449,14 +451,10 @@
         width: 100%;
         justify-content: center;
       }
-      .date-box {
+      .custom-date-trigger {
         flex: 1;
         justify-content: center;
-        max-width: 230px;
-      }
-      .date-box input {
-        font-size: 0.82rem;
-        padding: 3px 4px;
+        max-width: 240px;
       }
 
       .toolbar {
@@ -476,7 +474,6 @@
       }
     }
 
-    /* Print Setup */
     @page {
       size: A4 landscape;
       margin: 8mm 10mm;
@@ -579,10 +576,13 @@
     <!-- Date Navigation Box -->
     <div class="date-nav-wrapper">
       <button type="button" class="btn-arrow" onclick="changeWeek(-7)">◀</button>
-      <div class="date-box">
-        <label for="weekStart">Inizio:</label>
-        <input type="date" id="weekStart" dir="ltr">
+      
+      <div class="custom-date-trigger">
+        <label>Inizio:</label>
+        <span class="custom-date-text" id="dateDisplayText">--/--/----</span>
+        <input type="date" id="weekStart">
       </div>
+
       <button type="button" class="btn-arrow" onclick="changeWeek(7)">▶</button>
     </div>
   </header>
@@ -750,7 +750,7 @@
   ];
 
   function init() {
-    const saved = localStorage.getItem("bar_turni_all_it_v10");
+    const saved = localStorage.getItem("bar_turni_all_it_v11");
     if (saved) {
       try { state = JSON.parse(saved); } catch (e) {}
     }
@@ -773,13 +773,19 @@
 
   function saveData() {
     state.notes = document.getElementById("notesArea").value;
-    localStorage.setItem("bar_turni_all_it_v10", JSON.stringify(state));
+    localStorage.setItem("bar_turni_all_it_v11", JSON.stringify(state));
   }
 
   function renderDates() {
     if (!state.weekStart) return;
     const [y, m, d] = state.weekStart.split("-").map(Number);
     const curr = new Date(y, m - 1, d);
+
+    // Formats pure clean European string: DD/MM/YYYY
+    const dStr = String(curr.getDate()).padStart(2, "0");
+    const mStr = String(curr.getMonth() + 1).padStart(2, "0");
+    const yStr = curr.getFullYear();
+    document.getElementById("dateDisplayText").textContent = `${dStr}/${mStr}/${yStr}`;
 
     let endMonth = curr.getMonth();
     for (let i = 0; i < 7; i++) {
@@ -992,7 +998,6 @@
     }
   }
 
-  /* Centered Custom Modal for Nuova Settimana */
   function openResetModal() {
     document.getElementById("resetModal").classList.add("active");
   }
