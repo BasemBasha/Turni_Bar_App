@@ -24,54 +24,106 @@
       --chiuso-txt: #991b1b;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); padding: 12px; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      -webkit-tap-highlight-color: transparent; 
+    }
 
-    .container { max-width: 1200px; margin: 0 auto; }
+    body { 
+      background: var(--bg); 
+      color: var(--text); 
+      padding: 10px; 
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+    }
 
     header {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
-    .title-box h1 { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-    .title-box p { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .title-box {
+      display: flex;
+      flex-direction: column;
+    }
+    .title-box h1 { 
+      font-size: 1.15rem; 
+      font-weight: 800; 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      color: #0f172a;
+    }
+    .title-box p { 
+      font-size: 0.8rem; 
+      color: var(--muted); 
+      margin-top: 1px; 
+      font-weight: 600;
+    }
+
+    .date-nav-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-arrow {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1e293b;
+      transition: background 0.1s;
+    }
+    .btn-arrow:active { background: #e2e8f0; }
 
     .date-box {
       display: flex;
       align-items: center;
       gap: 6px;
       background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      padding: 4px 8px;
+      border: 1.5px solid #bfdbfe;
+      padding: 5px 10px;
       border-radius: 8px;
     }
-    .date-box label { font-size: 0.8rem; font-weight: 700; color: #1e40af; }
+    .date-box label { 
+      font-size: 0.78rem; 
+      font-weight: 700; 
+      color: #1e40af; 
+      white-space: nowrap;
+    }
     .date-box input {
       border: 1px solid #93c5fd;
       padding: 4px 6px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: #1e3a8a;
       background: #fff;
-    }
-
-    .btn-arrow {
-      background: #fff;
-      border: 1px solid var(--border);
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 700;
+      outline: none;
     }
 
     .toolbar {
@@ -79,99 +131,140 @@
       flex-wrap: wrap;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 9px 14px;
+      justify-content: center;
+      gap: 5px;
+      padding: 9px 12px;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
       cursor: pointer;
       border: none;
+      white-space: nowrap;
+      transition: transform 0.05s;
     }
-    .btn:active { transform: scale(0.98); }
+    .btn:active { transform: scale(0.97); }
     .btn-primary { background: var(--primary); color: #fff; }
-    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text); }
-    .btn-danger-outline { background: #fff; border: 1px solid #fca5a5; color: #b91c1c; }
+    .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-danger-outline { background: #fff; border: 1.5px solid #fca5a5; color: #b91c1c; }
 
     .table-container {
       background: var(--card);
       border-radius: 12px;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       margin-bottom: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      position: relative;
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       text-align: center;
-      min-width: 780px;
+      table-layout: fixed;
+      min-width: 760px;
     }
 
+    col.col-name-width { width: 110px; }
+    col.col-day-width { width: 92px; }
+
     th, td {
-      padding: 10px 6px;
-      border: 1px solid var(--border);
-      font-size: 0.88rem;
+      padding: 8px 4px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.84rem;
+      vertical-align: middle;
+    }
+    th:last-child, td:last-child {
+      border-right: none;
     }
 
     thead th {
       background: #0f172a;
       color: #fff;
       font-weight: 700;
+      height: 48px;
     }
     thead th .sub-date {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       color: #cbd5e1;
       font-weight: 500;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     th.col-name, td.col-name {
-      text-align: left;
-      font-weight: 700;
-      min-width: 145px;
-      max-width: 170px;
-      padding-left: 10px;
       position: sticky;
       left: 0;
-      background: #f8fafc;
       z-index: 2;
-      box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+      text-align: left;
+      font-weight: 700;
+      padding-left: 8px;
+      padding-right: 4px;
+      border-right: 2px solid #94a3b8 !important;
     }
+
     thead th.col-name {
-      background: #0f172a;
-      color: #fff;
+      background: #0f172a !important;
+      color: #fff !important;
       z-index: 3;
     }
 
-    tr.row-apertura td { background: var(--apertura-bg); color: var(--apertura-txt); font-weight: 700; }
-    tr.row-chiusura td { background: var(--chiusura-bg); color: var(--chiusura-txt); font-weight: 700; }
+    td.col-name {
+      background: #ffffff !important;
+      color: #0f172a;
+    }
+
+    tr.row-apertura td {
+      background: var(--apertura-bg);
+      color: var(--apertura-txt);
+      font-weight: 700;
+    }
+    tr.row-apertura td.col-name {
+      background: var(--apertura-bg) !important;
+    }
+
+    tr.row-chiusura td {
+      background: var(--chiusura-bg);
+      color: var(--chiusura-txt);
+      font-weight: 700;
+    }
+    tr.row-chiusura td.col-name {
+      background: var(--chiusura-bg) !important;
+    }
 
     .shift-cell {
       cursor: pointer;
       user-select: none;
-      min-width: 85px;
+      height: 46px;
     }
-    .shift-cell:active { background: #f1f5f9; }
+    .shift-cell:active { 
+      background: #f1f5f9; 
+    }
 
     .shift-badge {
-      display: inline-block;
-      padding: 6px 4px;
+      display: block;
+      padding: 5px 2px;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      width: 95%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      width: 100%;
+      word-break: break-word;
+      line-height: 1.15;
     }
 
     .badge-normal { color: var(--text); }
@@ -180,10 +273,16 @@
     .badge-chiuso { background: var(--chiuso-bg); color: var(--chiuso-txt); border: 1px solid #f87171; }
     .badge-empty { color: #94a3b8; font-weight: 500; }
 
+    .staff-name-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2px;
+    }
     .btn-trash {
       background: none;
       border: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
       cursor: pointer;
       color: #94a3b8;
       padding: 2px 4px;
@@ -193,10 +292,16 @@
     .notes-card {
       background: var(--card);
       border-radius: 12px;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       padding: 12px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-    .notes-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; color: #475569; }
+    .notes-card h3 { 
+      font-size: 0.88rem; 
+      font-weight: 700; 
+      margin-bottom: 6px; 
+      color: #475569; 
+    }
     .notes-card textarea {
       width: 100%;
       border: 1px solid var(--border);
@@ -207,6 +312,7 @@
       min-height: 48px;
       outline: none;
     }
+    .notes-card textarea:focus { border-color: var(--primary); }
 
     .modal-overlay {
       display: none;
@@ -216,33 +322,33 @@
       z-index: 999;
       align-items: center;
       justify-content: center;
-      padding: 14px;
+      padding: 12px;
     }
     .modal-overlay.active { display: flex; }
 
     .modal-card {
       background: #fff;
       border-radius: 16px;
-      max-width: 420px;
+      max-width: 400px;
       width: 100%;
       padding: 18px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
-    .modal-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
-    .modal-subtitle { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
+    .modal-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 3px; }
+    .modal-subtitle { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
 
     .preset-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 7px;
       margin-bottom: 12px;
     }
     .preset-btn {
-      padding: 10px 4px;
+      padding: 9px 2px;
       background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
@@ -256,14 +362,14 @@
     .custom-input-box {
       display: flex;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .custom-input-box input {
       flex: 1;
       padding: 9px 10px;
       border: 1.5px solid var(--border);
       border-radius: 8px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       outline: none;
     }
     .custom-input-box button {
@@ -282,13 +388,63 @@
       background: #f1f5f9;
       border: none;
       border-radius: 8px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: #475569;
       cursor: pointer;
     }
 
     .print-title { display: none; }
+
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+      }
+      .title-box {
+        text-align: center;
+        align-items: center;
+      }
+      .date-nav-wrapper {
+        width: 100%;
+        justify-content: center;
+      }
+      .date-box {
+        flex: 1;
+        justify-content: center;
+        max-width: 230px;
+      }
+      .date-box input {
+        font-size: 0.82rem;
+        padding: 3px 4px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+      }
+      .toolbar-left, .toolbar-right {
+        width: 100%;
+      }
+      .toolbar-left .btn, .toolbar-right .btn {
+        flex: 1;
+        padding: 9px 4px;
+        font-size: 0.78rem;
+      }
+
+      .mobile-swipe-hint {
+        display: block !important;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-top: -6px;
+        margin-bottom: 8px;
+      }
+    }
+
+    .mobile-swipe-hint { display: none; }
 
     @page {
       size: A4 landscape;
@@ -305,7 +461,7 @@
         padding: 0 !important;
         margin: 0 !important;
       }
-      header, .toolbar, .modal-overlay, .btn-trash {
+      header, .toolbar, .modal-overlay, .btn-trash, .mobile-swipe-hint {
         display: none !important;
       }
       .container {
@@ -318,7 +474,7 @@
         text-align: center;
         font-size: 19pt;
         font-weight: 800;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
         color: #0f172a;
         text-transform: uppercase;
       }
@@ -335,35 +491,35 @@
         border: 2px solid #0f172a !important;
       }
       tbody tr {
-        height: 52px !important;
+        height: 50px !important;
       }
       th, td {
         border: 1.5px solid #334155 !important;
-        padding: 8px 4px !important;
-        font-size: 11.5pt !important;
+        padding: 6px 2px !important;
+        font-size: 11pt !important;
         vertical-align: middle !important;
       }
       thead th {
         background: #0f172a !important;
         color: #fff !important;
-        font-size: 12pt !important;
+        font-size: 11.5pt !important;
       }
       thead th .sub-date {
         color: #cbd5e1 !important;
-        font-size: 9.5pt !important;
+        font-size: 9pt !important;
       }
       th.col-name, td.col-name {
         position: static !important;
         background: #f8fafc !important;
         color: #0f172a !important;
         font-weight: 800 !important;
-        width: 180px !important;
+        width: 140px !important;
         box-shadow: none !important;
       }
       thead th.col-name { background: #0f172a !important; color: #fff !important; }
       tr.row-apertura td { background: var(--apertura-bg) !important; color: var(--apertura-txt) !important; font-weight: 800 !important; }
       tr.row-chiusura td { background: var(--chiusura-bg) !important; color: var(--chiusura-txt) !important; font-weight: 800 !important; }
-      .shift-badge { font-size: 11pt !important; border: none !important; }
+      .shift-badge { font-size: 10.5pt !important; border: none !important; }
       .badge-chiuso { background: var(--chiuso-bg) !important; color: var(--chiuso-txt) !important; border: 1px solid #f87171 !important; }
       .badge-casa { background: var(--casa-bg) !important; color: var(--casa-txt) !important; }
       .badge-warn { background: var(--warn-bg) !important; color: var(--warn-txt) !important; border: 1.5px dashed #ca8a04 !important; }
@@ -372,8 +528,8 @@
         page-break-inside: avoid !important;
         padding: 8px 12px !important;
       }
-      .notes-card h3 { font-size: 10.5pt !important; margin-bottom: 2px !important; }
-      .notes-card textarea { border: none !important; font-size: 10pt !important; min-height: 42px !important; }
+      .notes-card h3 { font-size: 10pt !important; margin-bottom: 2px !important; }
+      .notes-card textarea { border: none !important; font-size: 9.5pt !important; min-height: 40px !important; }
     }
   </style>
 </head>
@@ -388,28 +544,38 @@
       <p id="headerSubtitle">Gestione turni settimanali</p>
     </div>
 
-    <div style="display: flex; gap: 6px; align-items: center;">
-      <button class="btn-arrow" onclick="changeWeek(-7)">◀</button>
+    <div class="date-nav-wrapper">
+      <button type="button" class="btn-arrow" onclick="changeWeek(-7)">◀</button>
       <div class="date-box">
         <label for="weekStart">Inizio:</label>
         <input type="date" id="weekStart">
       </div>
-      <button class="btn-arrow" onclick="changeWeek(7)">▶</button>
+      <button type="button" class="btn-arrow" onclick="changeWeek(7)">▶</button>
     </div>
   </header>
 
   <div class="toolbar">
-    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-      <button class="btn btn-primary" onclick="openAddStaffModal()">➕ Aggiungi Dipendente</button>
-      <button class="btn btn-danger-outline" onclick="resetShiftsOnly()">🔄 Nuova Settimana (Azzera Turni)</button>
+    <div class="toolbar-left">
+      <button type="button" class="btn btn-primary" onclick="openAddStaffModal()">➕ Aggiungi Dipendente</button>
+      <button type="button" class="btn btn-danger-outline" onclick="resetShiftsOnly()">🔄 Nuova Settimana (Azzera)</button>
     </div>
-    <div>
-      <button class="btn btn-outline" onclick="window.print()">🖨️ Stampa</button>
+    <div class="toolbar-right">
+      <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Stampa</button>
     </div>
   </div>
 
   <div class="table-container">
     <table id="shiftsTable">
+      <colgroup>
+        <col class="col-name-width">
+        <col class="col-day-width">
+        <col class="col-day-width">
+        <col class="col-day-width">
+        <col class="col-day-width">
+        <col class="col-day-width">
+        <col class="col-day-width">
+        <col class="col-day-width">
+      </colgroup>
       <thead>
         <tr>
           <th class="col-name">DIPENDENTE / RUOLO</th>
@@ -424,7 +590,7 @@
       </thead>
       <tbody id="mainTableBody">
         <tr class="row-apertura">
-          <td class="col-name">☀️ APERTURA BAR</td>
+          <td class="col-name">☀️ APERTURA</td>
           <td class="shift-cell" onclick="editRoleCell('apertura', 0)" id="apertura-0">-</td>
           <td class="shift-cell" onclick="editRoleCell('apertura', 1)" id="apertura-1">-</td>
           <td class="shift-cell" onclick="editRoleCell('apertura', 2)" id="apertura-2">-</td>
@@ -435,7 +601,7 @@
         </tr>
 
         <tr class="row-chiusura" id="chiusuraRow">
-          <td class="col-name">🌙 CHIUSURA BAR</td>
+          <td class="col-name">🌙 CHIUSURA</td>
           <td class="shift-cell" onclick="editRoleCell('chiusura', 0)" id="chiusura-0">-</td>
           <td class="shift-cell" onclick="editRoleCell('chiusura', 1)" id="chiusura-1">-</td>
           <td class="shift-cell" onclick="editRoleCell('chiusura', 2)" id="chiusura-2">-</td>
@@ -447,6 +613,8 @@
       </tbody>
     </table>
   </div>
+
+  <div class="mobile-swipe-hint">👈 اسحب الجدول يمين وشمال لعرض باقي الأيام 👉</div>
 
   <div class="notes-card">
     <h3>📌 Note & Comunicazioni della Settimana</h3>
@@ -463,10 +631,10 @@
     <div class="modal-subtitle" id="customInputLabel">Oppure scrivi orario personalizzato:</div>
     <div class="custom-input-box">
       <input type="text" id="customInput" placeholder="es. 8-13 oppure Nome..." onkeydown="if(event.key==='Enter') applyCustom()">
-      <button onclick="applyCustom()">Salva</button>
+      <button type="button" onclick="applyCustom()">Salva</button>
     </div>
 
-    <button class="btn-close-modal" onclick="closeModal()">Annulla</button>
+    <button type="button" class="btn-close-modal" onclick="closeModal()">Annulla</button>
   </div>
 </div>
 
@@ -476,9 +644,9 @@
     <div class="modal-subtitle">Nome della persona da aggiungere:</div>
     <div class="custom-input-box">
       <input type="text" id="newStaffName" placeholder="Nome (es. Marco)" onkeydown="if(event.key==='Enter') confirmAddStaff()">
-      <button onclick="confirmAddStaff()">Aggiungi</button>
+      <button type="button" onclick="confirmAddStaff()">Aggiungi</button>
     </div>
-    <button class="btn-close-modal" onclick="closeAddStaffModal()">Annulla</button>
+    <button type="button" class="btn-close-modal" onclick="closeAddStaffModal()">Annulla</button>
   </div>
 </div>
 
@@ -524,7 +692,7 @@
   ];
 
   function init() {
-    const saved = localStorage.getItem("bar_turni_fixed_v8");
+    const saved = localStorage.getItem("bar_turni_final_responsive_v9");
     if (saved) {
       try { state = JSON.parse(saved); } catch (e) {}
     }
@@ -547,7 +715,7 @@
 
   function saveData() {
     state.notes = document.getElementById("notesArea").value;
-    localStorage.setItem("bar_turni_fixed_v8", JSON.stringify(state));
+    localStorage.setItem("bar_turni_final_responsive_v9", JSON.stringify(state));
   }
 
   function renderDates() {
@@ -614,9 +782,9 @@
       const tdName = document.createElement("td");
       tdName.className = "col-name";
       tdName.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:4px;">
+        <div class="staff-name-wrap">
           <span>${person.name}</span>
-          <button class="btn-trash" title="Rimuovi ${person.name}" onclick="deleteStaff(${person.id}, '${person.name}')">🗑️</button>
+          <button type="button" class="btn-trash" title="Rimuovi ${person.name}" onclick="deleteStaff(${person.id}, '${person.name}')">🗑️</button>
         </div>
       `;
       tr.appendChild(tdName);
@@ -648,6 +816,7 @@
     grid.innerHTML = "";
     SHIFT_PRESETS.forEach(item => {
       const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = `preset-btn ${item.cls}`;
       btn.textContent = item.label;
       btn.onclick = () => applyPreset(item.val);
@@ -660,7 +829,7 @@
 
   function editRoleCell(roleType, dayIdx) {
     activeTarget = { type: roleType, dayIdx };
-    const label = roleType === 'apertura' ? '☀️ Apertura Bar' : '🌙 Chiusura Bar';
+    const label = roleType === 'apertura' ? '☀️ Apertura' : '🌙 Chiusura';
     const currentVal = state[roleType][dayIdx] || "";
 
     document.getElementById("modalTitle").textContent = `${label} — ${dayNames[dayIdx]}`;
@@ -673,6 +842,7 @@
     grid.innerHTML = "";
 
     const chiusoBtn = document.createElement("button");
+    chiusoBtn.type = "button";
     chiusoBtn.className = "preset-btn btn-chiuso";
     chiusoBtn.textContent = "🔒 CHIUSO";
     chiusoBtn.onclick = () => applyPreset("CHIUSO");
@@ -680,6 +850,7 @@
 
     state.staff.forEach(s => {
       const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = "preset-btn";
       btn.textContent = s.name;
       btn.onclick = () => applyPreset(s.name);
@@ -690,6 +861,7 @@
     extras.forEach(name => {
       if (!state.staff.some(s => s.name.toLowerCase() === name.toLowerCase())) {
         const btn = document.createElement("button");
+        btn.type = "button";
         btn.className = "preset-btn";
         btn.textContent = name;
         btn.onclick = () => applyPreset(name);
@@ -698,6 +870,7 @@
     });
 
     const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
     clearBtn.className = "preset-btn btn-clear";
     clearBtn.textContent = "❌ Svuota";
     clearBtn.onclick = () => applyPreset("");
